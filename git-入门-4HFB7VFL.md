@@ -1,3 +1,14 @@
+---
+tags:
+    - git入门
+parent: ""
+collections:
+    - git
+version: 0
+libraryID: 1
+itemKey: 4HFB7VFL
+
+---
 # git 入门
 
 参考视频教程
@@ -142,13 +153,17 @@
 
         git commit -m "第一次提交”
 
+*   针对修改的文件，可以同时暂存和提交
+
+        git commit -a -m "提交信息"
+
 *   查看提交记录
 
         git log
 
     <!---->
 
-        git log -oneline  //查看简洁的提交信息
+        git log --online  //查看简洁的提交信息
 
 ### 5.回退版本
 
@@ -274,7 +289,7 @@ glob匹配，图片有误
 
     2.      cd .shh  //跳转到.shh目录
 
-    3.      ssh-keygen -t rsa   //生成ssh文件，协议为rsa,若已有ssh文件，选no
+    3.      ssh-keygen -t rsa   //生成ssh文件，协议为rsa,若已有ssh文件，选no，可以选择密码为空
 
     4.  网上搜索github配置ssh
 
@@ -303,3 +318,133 @@ glob匹配，图片有误
 *       git pull <remote>  //拉取更新内容
 
 ### 关联本地仓库和远程仓库
+
+1.      git remote add origin git@github....   //添加远程仓库,别名（名称）为origin
+
+2.      git remote -v  //查看对应的远程仓库和地址
+
+3.      git branch -M main  //指定分支为main
+
+4.      git push -u origin main:main   //将本地main推送到远程main，如果名称相同，可以只写一个
+
+5.      git pull <远程仓库名><远程分支名> : <本地分支名>   //将远程仓库拉取到本地
+
+    1.  远程可以不写，默认origin main
+    2.  git pull会默认执行一次合并操作，如果远程本地没有冲突，可以合并
+    3.      git fetch //从远程拉取到本地，但不会执行合并操作，需要手动合并
+    4.  跳转到分支部分处理
+
+## 分支
+
+*   可以看作代码库中不同版本，可以独立存在，并有自己的提交记录
+*   多个开发人员可以在自己的分支工作，最后在合并到主线
+*   可以在一个分支上进行新功能的开发，beat版
+*   可以建立一个问题修复的分支来处理一些bug和缺陷
+*   保证主干上是稳定版本
+
+### 创建/查看/切换/合并/删除分支
+
+1.      git branch <分支名>   //创建分支
+
+2.      git banch   //查看分支列表，当前分支前有*
+
+3.      git switch <分支名>  //切换分支
+
+    <!---->
+
+        git chechout <分支名>   //切换分支,还可以恢复文件，有歧义，不用
+
+4.      git merge <分支名>  //将分支合并到当前分支，结合git switch用，会默认产生一次提交，需要写提交信息
+
+5.      git log --graph --online --decorate --all  //查看分支合并过程
+
+    <!---->
+
+        alias <别名> ="git log --graph --online --decorate --all"   //给较长的命令设置别名
+
+6.      git branch -d <分支名>  //删除已经合并后的分支
+
+7.      git branch -D <分支名>  //强制删除分支（未合并的）
+
+### 合并冲突
+
+在git merge <分支名> 合并后，发现有冲突（修改了同一文件的同一位置）
+
+1.      git status  //查看合并冲突的文件
+
+2.      git diff  --all //查看冲突的具体内容
+
+    \= 表示2个分支冲突的分界线
+
+3.  直接打开冲突的文件，进行编辑
+
+4.      git commit -a -m ""  //提交后自动完成合并
+
+5.      git merge --abort  //中断合并
+
+### 回退和rebase
+
+执行过程
+
+1.  找到分支的共同祖先main3
+2.  （在dev分支操作）找到main分支最新提交记录main5
+3.  将dev分支移动到main5，如左图所示
+
+![\<img alt="" data-attachment-key="LM5WQ6Z4" width="1509" height="850" src="attachments/LM5WQ6Z4.png" ztype="zimage">](attachments/LM5WQ6Z4.png)
+
+### merge与rebase区别
+
+*   merge优点：不会破坏原分支的提交历史，方便回溯和查看
+*   merge缺点：会产生额外的提交节点，分支图比较复杂
+*   rebase优点：不会新增额外的提交记录，形成线性历史，比较干净和直观
+*   rebase缺点：改变了提交历史和当前分支的branch out节点，应避免在共享分支中使用
+
+## 工作流模型
+
+GitFlow：团队水平适中，有一定的开发流程和规范的团队
+
+![\<img alt="" data-attachment-key="WW56CZZU" width="1449" height="770" src="attachments/WW56CZZU.png" ztype="zimage">](attachments/WW56CZZU.png)
+
+*   主分支：稳定版本，经过测试和审核，只能通过合并分支的方式修改，v1.0.0
+
+    *   主版本：主要功能或重大更新
+    *   次版本：新功能，通常不会影响现有功能
+    *   修订版本：bug修复
+    *       git tag <标签名> <提交ID>   //给提交设置标签
+    *       git push origin --tags   //推送所有本地标签
+
+*   热修复版本：紧急修复主分支上的bug，修复后，合并到主分支并删除，更新小版本号
+
+*   发布版本：准备项目发布，稳定后合并到主分支和开发分支
+
+*   开发版本：日常开发，长期存在
+
+*   功能版本：新功能，合并到开发版本
+
+GitHubFlow：团队水平较高的团队或者开源项目
+
+*   只有一个长期存在的主分支，可以直接部署到生产环境中的，会设置分支保护，禁止团队成员直接在主分支上进行提交
+*   团队成员会在主分支上分离出自己的分支，然后在本地分支提交代码
+*   开发完成后发起一个pull request（合并请求）
+*   团队成员进行代码评审，没有问题后合并到主分支
+
+分支命名技巧：带有意义的描述性名称来命名分支
+
+*   版本发布分支：v1.0.0
+*   功能分支：feature-login-page   //功能-登录-界面
+*   修复分支：hotfix-#issueid-desc
+
+分支管理技巧：
+
+*   定期合并已经成功验证的分支，及时删除已经合并的分支
+*   保持合适的分支数量
+*   为分支设置合适的管理权限
+
+## gitee国内平台和gitlab私有化部署
+
+*   gitee国内平台
+*   gitlab私有化部署
+
+## vscode侧边栏
+
+将常用功能集成到侧边栏了
